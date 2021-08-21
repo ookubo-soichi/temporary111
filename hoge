@@ -1,7 +1,67 @@
-https://sqlalchemy-migrate.readthedocs.io/en/latest/index.html
-https://flask-migrate.readthedocs.io/en/latest/
-https://tools.ietf.org/doc/python-migrate/html/changeset.html#
 
-https://pypi.org/project/alembic/
-https://qiita.com/penpenta/items/c993243c4ceee3840f30
-https://zenn.dev/jafro/articles/183020be3a0cea482c5b
+import json
+
+data = {"timestamp":[0,1,2],"value":[3,4,5]}
+
+with open('./db/data.txt', 'w') as outfile:
+    json.dump(json.dumps(data), outfile)
+    
+    
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Optional
+
+import json
+
+app = FastAPI()
+
+@app.get('/sample')
+async def hello():
+    with open('./db/data.txt') as json_file:
+        data = json.load(json_file)
+    return data
+    
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import altair as alt
+from vega_datasets import data
+import streamlit as st
+
+x = np.random.normal(50, 10, 1000)
+y = x[x < 60]
+df = pd.DataFrame({'value':list(y)})
+fig = alt.Chart(df).transform_window(
+    cumulative_count="count()",
+    sort=[{"field": "value"}],
+).mark_area().encode(
+    x="value:Q",
+    y="cumulative_count:Q",
+    tooltip=['value:Q', 'cumulative_count:Q']
+).interactive()
+st.write(fig)
+
+x = np.random.normal(50, 10, 1000)
+y = x[x >40]
+df = pd.DataFrame({'value':list(-1.0*y), 'value2':list(y),})
+fig = alt.Chart(df).transform_window(
+    cumulative_count="count()",
+    sort=[{"field": "value"}],
+).mark_area().encode(
+    x="value2:Q",
+    y="cumulative_count:Q",
+    tooltip=['value2:Q', 'cumulative_count:Q']
+).interactive()
+st.write(fig)
+
+x = np.random.normal(50, 10, 1000)
+key = np.arange(round(min(x),1)-0.1, round(max(x),1)+0.1, 1.0)
+num = [len(x[(key[i] < x) & (x < key[i+1])]) for i in range(len(key)-1)]
+num.append(len(x[(key[-1] < x)]))
+df = pd.DataFrame({'key':key, 'num':num})
+fig = alt.Chart(df).mark_bar().encode(
+    x="key:Q",
+    y="num:Q",
+    tooltip=['key:Q', 'num:Q']
+).interactive()
+st.write(fig)
